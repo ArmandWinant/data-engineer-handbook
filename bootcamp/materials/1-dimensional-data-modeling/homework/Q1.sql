@@ -1,3 +1,32 @@
+DROP TYPE IF EXISTS film_info;
+CREATE TYPE film_info AS (
+    filmid TEXT,
+    title TEXT,
+    votes INTEGER,
+    rating REAL
+                           );
+
+DROP TYPE IF EXISTS film_year;
+CREATE TYPE film_year AS (
+    year INTEGER,
+    films film_info[]
+                         );
+
+DROP TYPE IF EXISTS quality_class;
+CREATE TYPE quality_class AS
+    ENUM ('star', 'good', 'average', 'bad');
+
+DROP TABLE IF EXISTS actors;
+CREATE TABLE actors (
+    actorid TEXT,
+    name TEXT,
+    films film_year[],
+    quality_class quality_class,
+    is_active BOOLEAN,
+    current_year INTEGER,
+    PRIMARY KEY (actorid, current_year)
+);
+
 INSERT INTO actors
 WITH current_year AS (
     SELECT
@@ -29,10 +58,10 @@ SELECT
             cy.films
         )::film_year]
     WHEN cy.films IS NOT NULL
-        THEN py.films || (
+        THEN py.films || ARRAY[(
             cy.year,
             cy.films
-        )::film_year
+        )::film_year]
     ELSE py.films
     END AS films,
     CASE WHEN cy.films IS NOT NULL THEN
