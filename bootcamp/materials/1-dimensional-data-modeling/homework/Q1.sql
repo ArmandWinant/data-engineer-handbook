@@ -1,4 +1,8 @@
+DROP TABLE IF EXISTS actors;
+DROP TYPE IF EXISTS film_year;
 DROP TYPE IF EXISTS film_info;
+DROP TYPE IF EXISTS quality_class;
+
 CREATE TYPE film_info AS (
     filmid TEXT,
     title TEXT,
@@ -6,17 +10,14 @@ CREATE TYPE film_info AS (
     rating REAL
                            );
 
-DROP TYPE IF EXISTS film_year;
 CREATE TYPE film_year AS (
     year INTEGER,
     films film_info[]
                          );
 
-DROP TYPE IF EXISTS quality_class;
 CREATE TYPE quality_class AS
     ENUM ('star', 'good', 'average', 'bad');
 
-DROP TABLE IF EXISTS actors;
 CREATE TABLE actors (
     actorid TEXT,
     name TEXT,
@@ -41,13 +42,13 @@ WITH current_year AS (
         AVG(rating) AS year_rating,
         year
     FROM actor_films
-    WHERE year = 1974
+    WHERE year = 2021
     GROUP BY actorid, actor, year
 ),
     previous_year AS (
         SELECT *
         FROM actors
-        WHERE current_year = 1973
+        WHERE current_year = 2020
     )
 SELECT
     COALESCE(py.actorid, cy.actorid) AS actorid,
